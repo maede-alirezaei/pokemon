@@ -1,71 +1,117 @@
-import { useEffect, useState } from "react";
-import { get_pokemon_image_url, get_pokemon_names } from "./helpers";
+import React, { useEffect, useState } from "react";
+import {
+  PokemonData,
+  get_pokemon_image_url,
+  get_pokemon_names,
+} from "./helpers";
 
 import "./App.css";
 
-function PokemonCard({ name }: { name: string }) {
-  const [pokeImg, setPokeImg] = useState("");
+interface PokemonCardProps {
+  pokemon: PokemonData;
+  toggleFavorite: (id: string) => void;
+}
+
+function PokemonCard({ pokemon, toggleFavorite }: PokemonCardProps) {
+  const [pokeImg, setPokeImg] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await get_pokemon_image_url(name);
-      setPokeImg(result);
+      try {
+        const result = await get_pokemon_image_url(pokemon.name);
+        setPokeImg(result);
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
     };
-    fetchData();
-  }, [name]);
-  if (!name) return null;
 
-  if (!pokeImg) return null;
+    fetchData();
+  }, [pokemon]);
+
+  if (!pokemon || !pokeImg) return null;
 
   return (
     <div className="card">
-      {/* <button onClick={() => toggleFavorite(item.id)}>
-        {item.isFavorite ? "Unmark as Favorite" : "Mark as Favorite"}
-      </button> */}
-      <div className="name">{name}</div>
+      <button onClick={() => toggleFavorite(pokemon.id)}>
+        {pokemon.isFavorite ? "Unmark as Favorite" : "Mark as Favorite"}
+      </button>
+      <div className="name">{pokemon.name}</div>
       <img className="image" src={pokeImg} alt="Pokemon_Image" />
     </div>
   );
 }
 
-function PokemonGrid() {
-  const [data, setData] = useState<string[]>();
+const PokemonGrid = ({ initData }: { initData: PokemonData[] }) => {
+  const [pokemons, setPokemones] = useState<PokemonData[]>(initData);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
+  const toggleFavorite = (id: string) => {
+    setPokemones((prevFavorites) =>
+      prevFavorites.map((item) =>
+        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+      )
+    );
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await get_pokemon_names(25);
-      localStorage.setItem("pokemonData", result.toString());
-      setData(result);
-    };
-    fetchData();
-  }, []);
+    if (showFavoritesOnly) {
+      setPokemones((prevFavorites) =>
+        prevFavorites.filter((item) => item.isFavorite === true)
+      );
+    } else {
+      setPokemones(initData);
+    }
+  }, [showFavoritesOnly, initData]);
+  const favoriteHandler = () => {
+    setShowFavoritesOnly(!showFavoritesOnly);
+  };
 
   return (
     <div className="grid-container">
       <label>
-        <input type="checkbox" className="checkbox" />
+        <input
+          type="checkbox"
+          className="checkbox"
+          onChange={favoriteHandler}
+        />
         Favourites only
       </label>
       <br />
       <div className="grid">
-        {data &&
-          data.map((pokemonName, index) => (
-            <PokemonCard name={pokemonName} key={index} />
-          ))}
+        {pokemons.map((pokemon) => (
+          <PokemonCard
+            pokemon={pokemon}
+            key={pokemon.id}
+            toggleFavorite={toggleFavorite}
+          />
+        ))}
       </div>
     </div>
   );
-}
+};
 
-function App() {
+const App = () => {
+  const [data, setData] = useState<PokemonData[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await get_pokemon_names(25);
+        setData(result);
+      } catch (error) {
+        console.error("Error fetching Pokemon names:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <div
       className="App"
       style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}
     >
-      <PokemonGrid />
+      <PokemonGrid initData={data} />
     </div>
   );
-}
+};
 
 export default App;
