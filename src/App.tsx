@@ -47,15 +47,17 @@ const PokemonGrid = ({ initData }: { initData: PokemonData[] }) => {
 
   const toggleFavorite = (id: string) => {
     setPokemones((prevFavorites) =>
-      prevFavorites.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
+      prevFavorites
+        .map((item) =>
+          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+        )
+        .filter((item) => (showFavoritesOnly ? item.isFavorite : true))
     );
   };
   useEffect(() => {
     if (showFavoritesOnly) {
       setPokemones((prevFavorites) =>
-        prevFavorites.filter((item) => item.isFavorite === true)
+        prevFavorites.filter((item) => item.isFavorite)
       );
     } else {
       setPokemones(initData);
