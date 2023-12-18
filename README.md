@@ -1,6 +1,13 @@
-# Getting Started with Create React App
+# React Pokemon App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the React Pokemon App! This application displays a grid of Pokemon cards fetched from an API, allowing users to mark their favorite Pokemon.
+
+## Features
+
+- Fetches Pokemon data from an API.
+- Displays Pokemon cards with names and images.
+- Allows users to mark/unmark Pokemon as favorites.
+- Option to show only favorite Pokemon.
 
 ## Available Scripts
 
@@ -13,11 +20,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
