@@ -32,11 +32,11 @@ function PokemonCard({ pokemon, toggleFavorite }: PokemonCardProps) {
 
   return (
     <div className="card">
-      <button onClick={() => toggleFavorite(pokemon.id)}>
-        {pokemon.isFavorite ? "Unmark as Favorite" : "Mark as Favorite"}
-      </button>
       <div className="name">{pokemon.name}</div>
       <img className="image" src={pokeImg} alt="Pokemon_Image" />
+      <button className="favorite-button" onClick={() => toggleFavorite(pokemon.id)}>
+        {pokemon.isFavorite ? "Unmark as Favorite" : "Mark as Favorite"}
+      </button>
     </div>
   );
 }
@@ -77,8 +77,8 @@ const PokemonGrid = ({ initData }: { initData: PokemonData[] }) => {
         />
         Favourites only
       </label>
-      <br />
       <div className="grid">
+      {showFavoritesOnly && pokemons.length <= 0 && "No item has been selected" }
         {pokemons.map((pokemon) => (
           <PokemonCard
             pokemon={pokemon}
@@ -107,12 +107,9 @@ const App = () => {
     fetchData();
   }, []);
   return (
-    <div
-      className="App"
-      style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}
-    >
+    <>
       <PokemonGrid initData={data} />
-    </div>
+    </>
   );
 };
 
